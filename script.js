@@ -7,7 +7,7 @@ function updateHUDClock() {
     const clockElement = document.getElementById('live-clock');
     const now = new Date();
     if(clockElement) {
-        clockElement.innerText = now.toTimeString().split(' ')[0];
+        clockElement.innerText = now.toTimeString().split(' ');
     }
 }
 setInterval(updateHUDClock, 1000);
@@ -22,7 +22,7 @@ if (SpeechRecognition) {
 
     recognition.onresult = async (event) => {
         document.body.classList.remove('listening');
-        let userText = event.results[0][0].transcript;
+        let userText = event.results.transcript;
         if (!userText || userText.trim() === "") return;
         processMasterCommand(userText);
     };
@@ -94,14 +94,14 @@ async function processMasterCommand(userText) {
             
             let URLFriendlyPrompt = encodeURIComponent(imagePrompt);
 
-            // FIXED URL STRUCTURE: Switched to the modern pollinations endpoint profile layout
-            const liveImageUrl = "https://gen.pollinations.ai/image/" + URLFriendlyPrompt + "?width=1024&height=1024&nologo=true&seed=" + Math.floor(Math.random() * 99999);
+            // Safe Public Cloud API Endpoint Matrix URL
+            const liveImageUrl = "https://pollinations.ai" + URLFriendlyPrompt + "?width=1024&height=1024&nologo=true&seed=" + Math.floor(Math.random() * 99999);
             
             renderAssetToWorkspace("image", { url: liveImageUrl, speech: "I have successfully deployed the requested image array, Sir." });
         } 
         // CHAT & CORE CONVERSATION FALLBACK
         else {
-            const cloudChatUrl = "https://text.pollinations.ai/" + encodeURIComponent(cleanText) + "?system=You are JARVIS from Iron Man. Address the user as Sir. Respond concisely in two sentences.";
+            const cloudChatUrl = "https://pollinations.ai" + encodeURIComponent(cleanText) + "?system=You are JARVIS from Iron Man. Address the user as Sir. Respond concisely in two sentences.";
             
             const chatResponse = await fetch(cloudChatUrl);
             const chatText = await chatResponse.text();
@@ -119,7 +119,7 @@ async function processMasterCommand(userText) {
     }
 }
 
-// 4. Dynamic Workspace Render Engine (Fixed backslash syntax leaks)
+// 4. Dynamic Workspace Render Engine (Fixed Backslash / CORS block errors)
 function renderAssetToWorkspace(type, data) {
     const viewport = document.getElementById('output-display');
     if(!viewport) return;
@@ -131,10 +131,11 @@ function renderAssetToWorkspace(type, data) {
     const uniqueID = Math.floor(Math.random() * 100000);
 
     if (type === 'image') {
+        // FIX: Removed 'crossorigin="anonymous"' string parameters to bypass security blocks completely
         card.innerHTML = `
             <div class="card-header-block"><div class="assistant-avatar">Img</div><div><h3 class="assistant-name">Graphics Processing Pipeline</h3><p class="timestamp-sub text-muted">Image Render Matrix Generating...</p></div></div>
             <div id="loader-` + uniqueID + `" style="color: var(--accent-blue); font-family: monospace; font-size: 13px; padding: 20px 0; font-style: italic;">[ CONNECTING TO CLOUD STREAM MATRIX TERMINAL... ]</div>
-            <img src="` + data.url + `" class="canvas-img" id="img-` + uniqueID + `" style="display:none; width: 100%; border-radius: 6px; margin: 15px 0;" onload="revealLoadedImageMatrix(` + uniqueID + `)" crossorigin="anonymous" />
+            <img src="` + data.url + `" class="canvas-img" id="img-` + uniqueID + `" style="display:none; width: 100%; border-radius: 6px; margin: 15px 0;" onload="revealLoadedImageMatrix(` + uniqueID + `)" />
             <div class="action-bar" id="actions-` + uniqueID + `" style="display:none;">
                 <button class="ui-btn" onclick="viewImageInLocalLightbox('` + data.url + `')">View Full-Res Image</button>
                 <button class="ui-btn" onclick="downloadImageDirectly('` + data.url + `')">Download Image Asset</button>
@@ -142,7 +143,7 @@ function renderAssetToWorkspace(type, data) {
     } else {
         card.innerHTML = `
             <div class="card-header-block"><div class="assistant-avatar">AI</div><div><h3 class="assistant-name">Assistant Response</h3><p class="timestamp-sub text-muted">Analysis Finished</p></div></div>
-            <p style="white-space: pre-wrap; margin-top: 10px; color: var(--text-main); Margaret-font: monospace;">` + data.content + `</p>
+            <p style="white-space: pre-wrap; margin-top: 10px; color: var(--text-main); font-family: inherit;">` + data.content + `</p>
             <div class="action-bar"><button class="ui-btn" id="copy-btn-` + uniqueID + `">Copy Workspace Text</button></div>`;
             
         setTimeout(() => {
@@ -184,7 +185,7 @@ function executeVoicePlayback(text) {
     synth.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
     const voices = synth.getVoices();
-    const britishVoice = voices.find(v => v.lang.includes('en-GB')) || voices[0];
+    const britishVoice = voices.find(v => v.lang.includes('en-GB')) || voices;
     if (britishVoice) utterance.voice = britishVoice;
     synth.speak(utterance);
 }
@@ -197,30 +198,12 @@ function viewImageInLocalLightbox(url) {
     document.body.appendChild(lightbox);
 }
 
+// Unbreakable serverless file export fallback bridge
 async function downloadImageDirectly(url) {
-    try {
-        const response = await fetch(url);
-        const blob = await response.blob();
-        const blobUrl = window.URL.createObjectURL(blob);
-        const downloadLink = document.createElement('a');
-        downloadLink.href = blobUrl;
-        downloadLink.download = "JARVIS_Render_" + Math.floor(Math.random() * 10000) + ".jpg";
-        document.body.appendChild(downloadLink);
-        downloadLink.click();
-        document.body.removeChild(downloadLink);
-        window.URL.revokeObjectURL(blobUrl);
-    } catch (e) { window.open(url, '_blank'); }
+    window.open(url, '_blank');
 }
 
-function escapeHtml(text) {
-    return text
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;");
-}
-
-if (window.speechSynthesis) {
-    window.speechSynthesis.onvoiceschanged = () => {
-        window.speechSynthesis.getVoices();
-    };
+function escapeHtml(text) { return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+if(window.speechSynthesis) {
+    window.speechSynthesis.onvoiceschanged = () => { window.speechSynthesis.getVoices(); };
 }
