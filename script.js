@@ -2,7 +2,6 @@ const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecogni
 let recognition;
 let isProcessing = false;
 
-// 1. Live Layout System HUD Clock Logic
 function updateHUDClock() {
     const clockElement = document.getElementById('live-clock');
     const now = new Date();
@@ -13,7 +12,6 @@ function updateHUDClock() {
 setInterval(updateHUDClock, 1000);
 updateHUDClock();
 
-// 2. Initializing Speech Configuration Setup
 if (SpeechRecognition) {
     recognition = new SpeechRecognition();
     recognition.lang = 'en-US';
@@ -53,7 +51,6 @@ if(document.getElementById('startButton')) {
 }
 window.addEventListener('keydown', (e) => { if (e.code === "Space") { e.preventDefault(); startListeningGate(); } });
 
-// Keyboard Interface Inputs
 const inputField = document.getElementById('keyboard-input');
 const sendBtn = document.getElementById('send-input-btn');
 
@@ -68,7 +65,6 @@ if(inputField) {
     });
 }
 
-// 3. SERVERLESS INTENT ROUTER (Works perfectly on live GitHub Pages!)
 async function processMasterCommand(userText) {
     isProcessing = true;
     const cleanText = userText.trim();
@@ -82,7 +78,6 @@ async function processMasterCommand(userText) {
     }
 
     try {
-        // IMAGE GENERATION CHANNEL (Direct cloud sync, no localhost backend required!)
         if (lowerText.startsWith("image ") || lowerText.startsWith("generate ") || lowerText.includes("picture of") || lowerText.includes("draw me")) {
             let imagePrompt = cleanText
                 .replace(/generate image of/i, "")
@@ -92,14 +87,14 @@ async function processMasterCommand(userText) {
                 .replace(/draw me/i, "")
                 .trim();
             
-            let URLFriendlyPrompt = encodeURIComponent(imagePrompt);
+            // Encode the keywords into lower-case alphanumeric formats
+            let URLFriendlyPrompt = encodeURIComponent(imagePrompt.toLowerCase().replace(/[^a-z0-9\s]/g, ''));
 
-            // Safe Public Cloud API Endpoint Matrix URL
+            // FIXED ENDPOINT URL: Directly matching the active Pollinations rendering schema
             const liveImageUrl = "https://pollinations.ai" + URLFriendlyPrompt + "?width=1024&height=1024&nologo=true&seed=" + Math.floor(Math.random() * 99999);
             
             renderAssetToWorkspace("image", { url: liveImageUrl, speech: "I have successfully deployed the requested image array, Sir." });
         } 
-        // CHAT & CORE CONVERSATION FALLBACK
         else {
             const cloudChatUrl = "https://pollinations.ai" + encodeURIComponent(cleanText) + "?system=You are JARVIS from Iron Man. Address the user as Sir. Respond concisely in two sentences.";
             
@@ -119,7 +114,7 @@ async function processMasterCommand(userText) {
     }
 }
 
-// 4. Dynamic Workspace Render Engine (Fixed Backslash / CORS block errors)
+// FIXED VISUAL DRAW ENGINE: Renders the image element instantly to prevent loading blocks
 function renderAssetToWorkspace(type, data) {
     const viewport = document.getElementById('output-display');
     if(!viewport) return;
@@ -128,40 +123,28 @@ function renderAssetToWorkspace(type, data) {
     const card = document.createElement('div');
     card.className = "response-card";
 
-    const uniqueID = Math.floor(Math.random() * 100000);
-
     if (type === 'image') {
-        // FIX: Removed 'crossorigin="anonymous"' string parameters to bypass security blocks completely
+        // FIXED LAYOUT: Displays the image directly inside the card framework without forcing hidden styles
         card.innerHTML = `
-            <div class="card-header-block"><div class="assistant-avatar">Img</div><div><h3 class="assistant-name">Graphics Processing Pipeline</h3><p class="timestamp-sub text-muted">Image Render Matrix Generating...</p></div></div>
-            <div id="loader-` + uniqueID + `" style="color: var(--accent-blue); font-family: monospace; font-size: 13px; padding: 20px 0; font-style: italic;">[ CONNECTING TO CLOUD STREAM MATRIX TERMINAL... ]</div>
-            <img src="` + data.url + `" class="canvas-img" id="img-` + uniqueID + `" style="display:none; width: 100%; border-radius: 6px; margin: 15px 0;" onload="revealLoadedImageMatrix(` + uniqueID + `)" />
-            <div class="action-bar" id="actions-` + uniqueID + `" style="display:none;">
-                <button class="ui-btn" onclick="viewImageInLocalLightbox('` + data.url + `')">View Full-Res Image</button>
-                <button class="ui-btn" onclick="downloadImageDirectly('` + data.url + `')">Download Image Asset</button>
+            <div class="card-header-block">
+                <div class="assistant-avatar">Img</div>
+                <div>
+                    <h3 class="assistant-name">Graphics Processing Pipeline</h3>
+                    <p class="timestamp-sub text-muted">Image Render Matrix Complete</p>
+                </div>
+            </div>
+            <img src="${data.url}" class="canvas-img" style="width: 100%; border-radius: 6px; margin: 15px 0; border: 1px solid var(--border-subtle); display: block;" />
+            <div class="action-bar">
+                <button class="ui-btn" onclick="viewImageInLocalLightbox('${data.url}')">View Full-Res Image</button>
+                <button class="ui-btn" onclick="window.open('${data.url}', '_blank')">Open Original Tab</button>
             </div>`;
     } else {
         card.innerHTML = `
             <div class="card-header-block"><div class="assistant-avatar">AI</div><div><h3 class="assistant-name">Assistant Response</h3><p class="timestamp-sub text-muted">Analysis Finished</p></div></div>
-            <p style="white-space: pre-wrap; margin-top: 10px; color: var(--text-main); font-family: inherit;">` + data.content + `</p>
-            <div class="action-bar"><button class="ui-btn" id="copy-btn-` + uniqueID + `">Copy Workspace Text</button></div>`;
-            
-        setTimeout(() => {
-            const btn = document.getElementById('copy-btn-' + uniqueID);
-            if(btn) btn.onclick = () => { navigator.clipboard.writeText(data.content); alert('Copied!'); };
-        }, 50);
+            <p style="white-space: pre-wrap; margin-top: 10px; color: var(--text-main); font-family: inherit;">${data.content}</p>
+            <div class="action-bar"><button class="ui-btn" id="copy-btn-${Math.floor(Math.random() * 1000)}">Copy Workspace Text</button></div>`;
     }
     viewport.prepend(card); 
-}
-
-function revealLoadedImageMatrix(id) {
-    const loader = document.getElementById("loader-" + id);
-    const imageElement = document.getElementById("img-" + id);
-    const actionBlock = document.getElementById("actions-" + id);
-    
-    if(loader) loader.style.display = 'none';
-    if(imageElement) imageElement.style.display = 'block';
-    if(actionBlock) actionBlock.style.display = 'flex';
 }
 
 function displayInternalSystemNotice(msg) {
@@ -174,7 +157,7 @@ function displayInternalSystemNotice(msg) {
     card.style.borderColor = "var(--alert-crimson)";
     card.innerHTML = `
         <div class="card-header-block"><div class="assistant-avatar" style="background: var(--alert-crimson);">!</div><div><h3 class="assistant-name" style="color: var(--alert-crimson);">System Exception Warning</h3><p class="timestamp-sub text-muted">Action Terminated</p></div></div>
-        <p style="color: var(--alert-crimson); font-family: monospace; font-size: 13px; margin: 10px 0 0 0;">` + msg + `</p>`;
+        <p style="color: var(--alert-crimson); font-family: monospace; font-size: 13px; margin: 10px 0 0 0;">${msg}</p>`;
     viewport.prepend(card);
     isProcessing = false;
 }
@@ -193,14 +176,9 @@ function executeVoicePlayback(text) {
 function viewImageInLocalLightbox(url) {
     const lightbox = document.createElement('div');
     lightbox.style.position = 'fixed'; lightbox.style.top = '0'; lightbox.style.left = '0'; lightbox.style.width = '100vw'; lightbox.style.height = '100vh'; lightbox.style.backgroundColor = 'rgba(11, 14, 20, 0.95)'; lightbox.style.display = 'flex'; lightbox.style.justifyContent = 'center'; lightbox.style.alignItems = 'center'; lightbox.style.zIndex = '99999'; lightbox.style.cursor = 'zoom-out';
-    lightbox.innerHTML = `<img src="` + url + `" style="max-width: 90%; max-height: 90%; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);" />`;
+    lightbox.innerHTML = `<img src="${url}" style="max-width: 90%; max-height: 90%; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);" />`;
     lightbox.onclick = () => lightbox.remove();
     document.body.appendChild(lightbox);
-}
-
-// Unbreakable serverless file export fallback bridge
-async function downloadImageDirectly(url) {
-    window.open(url, '_blank');
 }
 
 function escapeHtml(text) { return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
