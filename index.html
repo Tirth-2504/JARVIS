@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional AI Assistant Workspace</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- System Control Sidebar (Left) -->
+        <aside class="sidebar">
+            <div class="sidebar-top">
+                <div class="brand-header">
+                    <div class="status-dot pulsing"></div>
+                    <span class="brand-title">SYSTEM PLATFORM</span>
+                    <span class="version-tag">v4.5</span>
+                </div>
+                
+                <div class="voice-module">
+                    <button class="voice-action-btn" id="startButton">
+                        <svg class="mic-icon" viewBox="0 0 24 24" width="16" height="16">
+                            <path fill="currentColor" d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.42 2.72 6.2 6 6.72V21h2v-3.28c3.28-.52 6-3.3 6-6.72h-1.7z"/>
+                        </svg>
+                        <span id="status-text">Initialize Voice Feed</span>
+                    </button>
+                    <p class="macro-hint">or tap Spacebar anywhere</p>
+                </div>
+
+                <div class="telemetry-panel">
+                    <div class="panel-label">Input Telemetry Stream</div>
+                    <div id="user-speech" class="telemetry-output">System idle. Ready for instruction arrays...</div>
+                </div>
+            </div>
+
+            <div class="sidebar-footer">
+                <div class="system-meta">
+                    <div>Host: <span class="meta-value">Localhost:3000</span></div>
+                    <div>Engine: <span class="meta-value">Llama-3.2 & Image-Gen</span></div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Display Canvas Workspace (Right) -->
+        <main class="main-content">
+            <header class="canvas-header">
+                <div class="view-title">Workspace Deck // Active Session</div>
+                <div class="system-clock-card">
+                    <span class="clock-label">System Time:</span>
+                    <span id="live-clock" class="clock-value">00:00:00</span>
+                </div>
+            </header>
+
+            <!-- Scrollable Output Container Stack -->
+            <div id="output-display" class="workspace-viewport">
+                <!-- Platform Welcome Brief -->
+                <div class="response-card dynamic-welcome">
+                    <div class="card-header-block">
+                        <div class="assistant-avatar">AI</div>
+                        <div>
+                            <h3 class="assistant-name">System Assistant Interface</h3>
+                            <p class="timestamp-sub text-muted">Core generation infrastructure operational</p>
+                        </div>
+                    </div>
+                    <div class="card-body-block">
+                        <p>Welcome back, Sir. The platform environment is fully unlocked. I can generate any data structural assets you require right onto this workspace canvas. No external accounts or subscriptions are tied to this mainframe module.</p>
+                        
+                        <div class="capability-matrix">
+                            <div class="matrix-item">
+                                <strong>Code Synthesizer</strong>
+                                <span>Generates full scripts and apps with one-click copy.</span>
+                            </div>
+                            <div class="matrix-item">
+                                <strong>Image & Render Core</strong>
+                                <span>Produces detailed graphics on-demand with zero caps.</span>
+                            </div>
+                            <div class="matrix-item">
+                                <strong>Video Storyboarder</strong>
+                                <span>Generates conceptual layouts and script outlines.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fixed Conversational Console Dock Footer -->
+            <footer class="console-dock">
+                <div class="input-wrapper">
+                    <input type="text" id="keyboard-input" placeholder="Ask anything: 'write code for a game', 'generate an image of a cyber armor', 'open youtube'..." autocomplete="off"/>
+                    <button class="submit-btn" id="send-input-btn">
+                        <svg viewBox="0 0 24 24" width="16" height="16">
+                            <path fill="currentColor" d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                        </svg>
+                    </button>
+                </div>
+            </footer>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
