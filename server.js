@@ -13,16 +13,18 @@ app.post('/api/generate-asset', async (req, res) => {
 
     try {
         if (type === 'image') {
-            // FORCE CLEANUP: Bypasses Llama formatting and directly reads your prompt
             let directPrompt = prompt || "futuristic city";
             
-            // Clean out any weird characters or placeholders the AI might have accidentally left behind
-            directPrompt = directPrompt.replace(/\{.*\}/g, "").trim(); 
-            
-            const cleanedKeywords = encodeURIComponent(directPrompt);
-            
-            // Unbreakable Direct URL Structure
-            const liveImageUrl = `https://pollinations.ai{cleanedKeywords}?width=1024&height=1024&nologo=true&seed=${Math.floor(Math.random() * 99999)}`;
+            // FIX: Clean the prompt text to match Pollinations' strict hyphen-based format
+            // This transforms "Cyber Armor Layout" into "cyber-armor-layout"
+            let URLFriendlyPrompt = directPrompt
+                .toLowerCase()
+                .trim()
+                .replace(/[^a-z0-9\s]/g, '') // Remove punctuation marks
+                .replace(/\s+/g, '-');       // Convert all spaces to hyphens
+
+            // Updated address link using the clean hyphen structure
+            const liveImageUrl = `https://pollinations.ai{URLFriendlyPrompt}?width=1024&height=1024&nologo=true&seed=${Math.floor(Math.random() * 99999)}`;
             
             console.log(`Generated Direct URL -> ${liveImageUrl}`);
 
